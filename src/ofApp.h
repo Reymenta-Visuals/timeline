@@ -2,9 +2,11 @@
 
 #include "ofMain.h"
 #include "ofxTimeline.h"
+#include "ofxMidi.h"
 #include "ofxLibwebsockets.h"
+#define NUM_MESSAGES 30 // how many past messages we want to keep
 
-class ofApp : public ofBaseApp{
+class ofApp : public ofBaseApp, public ofxMidiListener {
 
 	public:
 		void setup();
@@ -20,11 +22,17 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+		void exit();
 		// timeline
 		ofxTimeline timeline;
 
 		// websockets
-		ofxLibwebsockets::Client client;
+		ofxLibwebsockets::Server server;
+		// queue of rec'd messages
+		vector<string> messages;
+		// string to send to clients
+		string toSend;
+		bool bSetup;
 
 		// websocket methods
 		void onConnect(ofxLibwebsockets::Event& args);
@@ -33,4 +41,12 @@ class ofApp : public ofBaseApp{
 		void onIdle(ofxLibwebsockets::Event& args);
 		void onMessage(ofxLibwebsockets::Event& args);
 		void onBroadcast(ofxLibwebsockets::Event& args);
+
+		// midi
+		void newMidiMessage(ofxMidiMessage& eventArgs);
+		ofxMidiIn midiIn;
+		ofxMidiIn midiInLaunchpad;
+		ofxMidiIn midiInNanoKontrol;
+		ofxMidiMessage midiMessage;
+
 };
